@@ -42,7 +42,7 @@ namespace FileTransfe.Core
                     Stream stream = await httpResponseMessage.Content.ReadAsStreamAsync();
                     stream.ReadTimeout = 10 * 1000;
                     await Download(stream, fileStream, downloadFile, downloadMsg);
-                    if (md5 == MD5Tools.GetFileMd5(downloadPartPath))
+                    if (md5 == null || md5 == MD5Tools.GetFileMd5(downloadPartPath))
                     {
                         downloadMsg.Complete = true;
                     }
@@ -85,7 +85,7 @@ namespace FileTransfe.Core
                         URL = uri.AbsoluteUri
                     };
                     await Download(stream, fileStream, downloadFile, downloadMsg);
-                    if (md5 == MD5Tools.GetFileMd5(downloadPartPath))
+                    if (md5 == null || md5 == MD5Tools.GetFileMd5(downloadPartPath))
                     {
                         downloadMsg.Complete = true;
                     }

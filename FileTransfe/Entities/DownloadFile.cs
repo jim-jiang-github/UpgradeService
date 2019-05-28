@@ -6,7 +6,6 @@ using System.Text;
 
 namespace FileTransfe.Entities
 {
-    [Serializable]
     public class DownloadFile
     {
         public string URL { get; set; }

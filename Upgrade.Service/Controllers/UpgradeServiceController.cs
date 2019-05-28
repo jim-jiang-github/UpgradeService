@@ -9,8 +9,9 @@ using FileTransfe.Entities;
 using System.IO;
 using System.Net.Http.Headers;
 using Microsoft.Net.Http.Headers;
+using System.Net.Http;
 
-namespace UpgradeService.Controllers
+namespace Upgrade.Service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -31,13 +32,35 @@ namespace UpgradeService.Controllers
         [HttpGet("download")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public Task<ActionResult> Download(string fileName)
+        public Task<IActionResult> Download(string fileName)
         {
-            return Task.Run<ActionResult>(() =>
+            return Task.Run<IActionResult>(() =>
             {
                 Stream stream = ServerDownload.GetDownloadStream(this.HttpContext, fileName);
                 return File(stream, this.HttpContext.Response.Headers[HeaderNames.ContentType].ToString(), true);
             });
         }
+        [HttpPost("upload")]
+        public IActionResult UploadFile()
+        {
+            var file = Request.Form.Files;
+
+            return RedirectToAction("Files");
+        }
+        //[HttpPost("upgradeRelease")]
+        //public Task<IActionResult> UpgradeRelease(string version)
+        //{
+
+        //}
+        //[HttpPost("upgradeReleasing")]
+        //public Task<IActionResult> UpgradeReleasing(string version)
+        //{
+
+        //}
+        //[HttpPost("upgradeReleaseComplete")]
+        //public Task<IActionResult> UpgradeReleaseComplete(string version)
+        //{
+
+        //}
     }
 }
