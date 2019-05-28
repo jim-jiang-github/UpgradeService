@@ -12,19 +12,24 @@ namespace FileTransfe.Core
 {
     /// <summary> 服务端下载
     /// </summary>
-    public static class ServerDownload
+    public class ServerDownload
     {
+        private string downloadRoot = string.Empty;
+        public ServerDownload(string downloadRoot)
+        {
+            this.downloadRoot = downloadRoot;
+        }
         private static string baseDirector = AppContext.BaseDirectory;
         #region const
         private const int BufferSize = 80 * 1024;
         #endregion
         /// <summary> 下载根目录
         /// </summary>
-        private static string DownloadRoot
+        private string DownloadRoot
         {
             get
             {
-                string downloadRoot = Path.Combine(baseDirector, "downloads");
+                string downloadRoot = Path.Combine(baseDirector, this.downloadRoot);
                 if (!Directory.Exists(downloadRoot))
                 {
                     Directory.CreateDirectory(downloadRoot);
@@ -36,7 +41,7 @@ namespace FileTransfe.Core
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private static string GetServerFilePath(this string fileName)
+        private string GetServerFilePath(string fileName)
         {
             return Path.Combine(DownloadRoot, fileName);
         }
@@ -45,7 +50,7 @@ namespace FileTransfe.Core
         /// <param name="request"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        private static PartialFileInfo GetPartialFileInfo(this HttpRequest request, string filePath)
+        private PartialFileInfo GetPartialFileInfo(HttpRequest request, string filePath)
         {
             PartialFileInfo partialFileInfo = new PartialFileInfo(filePath);
             if (RangeHeaderValue.TryParse(request.Headers[HeaderNames.Range].ToString(), out RangeHeaderValue rangeHeaderValue))
@@ -87,7 +92,7 @@ namespace FileTransfe.Core
         /// </summary>
         /// <param name="partialFileInfo"></param>
         /// <returns></returns>
-        private static Stream GetPartialFileStream(this PartialFileInfo partialFileInfo)
+        private Stream GetPartialFileStream( PartialFileInfo partialFileInfo)
         {
             return new PartialFileStream(partialFileInfo.FilePath, partialFileInfo.From, partialFileInfo.To);
         }
@@ -98,7 +103,7 @@ namespace FileTransfe.Core
         /// <param name="partialFileInfo"></param>
         /// <param name="fileLength"></param>
         /// <param name="fileName"></param>
-        private static void SetResponseHeaders(this HttpResponse response, PartialFileInfo partialFileInfo)
+        private void SetResponseHeaders(HttpResponse response, PartialFileInfo partialFileInfo)
         {
             response.Headers[HeaderNames.AcceptRanges] = "bytes";
             response.StatusCode = partialFileInfo.IsPartial ? StatusCodes.Status206PartialContent : StatusCodes.Status200OK;
@@ -114,30 +119,30 @@ namespace FileTransfe.Core
                 response.Headers[HeaderNames.ContentRange] = new ContentRangeHeaderValue(partialFileInfo.From, partialFileInfo.To, partialFileInfo.FileLength).ToString();
             }
         }
-        /// <summary> 获取下载流
+        /// <summary> 异步获取下载流
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static Task<Stream> GetDownloadStreamAsync(HttpContext httpContext, string fileName)
+        public Task<Stream> GetDownloadStreamAsync(HttpContext httpContext, string fileName)
         {
             return Task.Run<Stream>(() =>
             {
-                string filePath = fileName.GetServerFilePath();
-                PartialFileInfo partialFileInfo = httpContext.Request.GetPartialFileInfo(filePath);
-                httpContext.Response.SetResponseHeaders(partialFileInfo);
-                return partialFileInfo.GetPartialFileStream();
+                string filePath = this.GetServerFilePath(fileName);
+                PartialFileInfo partialFileInfo = this.GetPartialFileInfo(httpContext.Request, filePath);
+                this.SetResponseHeaders(httpContext.Response, partialFileInfo);
+                return this.GetPartialFileStream(partialFileInfo);
             });
         }
         /// <summary> 获取下载流
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static Stream GetDownloadStream(HttpContext httpContext, string fileName)
+        public Stream GetDownloadStream(HttpContext httpContext, string fileName)
         {
-            string filePath = fileName.GetServerFilePath();
-            PartialFileInfo partialFileInfo = httpContext.Request.GetPartialFileInfo(filePath);
-            httpContext.Response.SetResponseHeaders(partialFileInfo);
-            return partialFileInfo.GetPartialFileStream();
+            string filePath = this.GetServerFilePath(fileName);
+            PartialFileInfo partialFileInfo = this.GetPartialFileInfo(httpContext.Request, filePath);
+            this.SetResponseHeaders(httpContext.Response, partialFileInfo);
+            return this.GetPartialFileStream(partialFileInfo);
         }
     }
 }

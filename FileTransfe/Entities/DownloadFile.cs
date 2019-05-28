@@ -6,6 +6,7 @@ using System.Text;
 
 namespace FileTransfe.Entities
 {
+    [Serializable]
     public class DownloadFile
     {
         public string URL { get; set; }
@@ -33,15 +34,19 @@ namespace FileTransfe.Entities
         /// <returns></returns>
         public static DownloadFile FromFileStream(FileStream fileStream)
         {
-            byte[] lengthBytes = new byte[4];
-            fileStream.Position = fileStream.Length - 4;
-            fileStream.Read(lengthBytes, 0, 4);
-            int length = BitConverter.ToInt32(lengthBytes, 0);
-            fileStream.Position = fileStream.Length - 4 - length;
-            byte[] objBytes = new byte[length];
-            fileStream.Read(objBytes, 0, length);
-            fileStream.Position = fileStream.Length - 4 - length;
-            return DownloadFile.FromByte(objBytes);
+            try
+            {
+                byte[] lengthBytes = new byte[4];
+                fileStream.Position = fileStream.Length - 4;
+                fileStream.Read(lengthBytes, 0, 4);
+                int length = BitConverter.ToInt32(lengthBytes, 0);
+                fileStream.Position = fileStream.Length - 4 - length;
+                byte[] objBytes = new byte[length];
+                fileStream.Read(objBytes, 0, length);
+                fileStream.Position = fileStream.Length - 4 - length;
+                return DownloadFile.FromByte(objBytes);
+            }
+            catch { return null; }
         }
         /// <summary> 吧对象追加到文件流的结尾
         /// </summary>

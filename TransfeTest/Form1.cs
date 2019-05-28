@@ -16,11 +16,15 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FileTransfe.Core;
 using System.Net;
+using Newtonsoft.Json;
+using FileTransfe;
 
 namespace TransfeTest
 {
     public partial class Form1 : Form
     {
+        private ClientUpload clientUpload = new ClientUpload("http://localhost:22437/api/UpgradeServer/upload", "http://localhost:22437/api/UpgradeServer/merge");
+        private ClientDownload clientDownload = new ClientDownload("http://localhost:22437/api/UpgradeServer/download");
         public Form1()
         {
             InitializeComponent();
@@ -28,75 +32,96 @@ namespace TransfeTest
 
         private async void Button1_Click(object sender, EventArgs e)
         {
-            string fileName = "BlueStacksGPSetup.exe";
-            //string fileName = "CentOS-7-x86_64-DVD-1810.iso";
-            //string fileName = "svn客户端设置.doc";
-            //string url = "http://120.79.81.121:9099/api/Upgrade/download?fileName=" + fileName;
-            string url = "http://localhost:9099/api/UpgradeService/download?fileName=" + fileName;
-            url = "http://120.79.81.121/api/UpgradeService/download?fileName=1.zip";
-            url = $"https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip";
-            url = "https://dldir1.qq.com/qqfile/qq/PCQQ9.1.3/25323/QQ9.1.3.25323.exe";
-            DownloadMsg downloadMsg = new DownloadMsg();
-            downloadMsg.DownloadMsgChanged += (s, ee) =>
+            string fileName = "donetRepair4.5.exe";
+            clientDownload.DownloadProgressChanged += (s, ee) =>
             {
                 this.Invoke(new MethodInvoker(() =>
                 {
-                    this.label1.Text = downloadMsg.Speed.ToString();
-                    this.label2.Text = downloadMsg.Progress.ToString();
+                    this.label1.Text = ee.ToString();
                 }));
-                if (downloadMsg.Complete)
-                {
-
-                }
             };
-            ClientDownload.Download(new Uri(url), fileName, downloadMsg);
+            clientDownload.DownloadSpeedChanged += (s, ee) =>
+            {
+                this.Invoke(new MethodInvoker(() =>
+                {
+                    this.label2.Text = ee.ToString();
+                }));
+            };
+            clientDownload.DownloadError += (s, ee) =>
+            {
+            };
+            clientDownload.DownloadCompleted += (s, ee, ss) =>
+            {
+            };
+            clientDownload.Download(fileName);
         }
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            string fileName = "BlueStacksGPSetup.exe";
+            string fileName = "donetRepair4.5.exe";
             string downloadPartPath = Path.Combine(fileName + ".downloadPart");
 
-            DownloadMsg downloadMsg = new DownloadMsg();
-            downloadMsg.DownloadMsgChanged += (s, ee) =>
+            clientDownload.DownloadProgressChanged += (s, ee) =>
             {
                 this.Invoke(new MethodInvoker(() =>
                 {
-                    this.label1.Text = downloadMsg.Speed.ToString();
-                    this.label2.Text = downloadMsg.Progress.ToString();
+                    this.label1.Text = ee.ToString();
                 }));
             };
-            ClientDownload.Download(downloadPartPath, downloadMsg);
+            clientDownload.DownloadSpeedChanged += (s, ee) =>
+            {
+                this.Invoke(new MethodInvoker(() =>
+                {
+                    this.label2.Text = ee.ToString();
+                }));
+            };
+            clientDownload.DownloadError += (s, ee) =>
+            {
+            };
+            clientDownload.DownloadCompleted += (s, ee, ss) =>
+            {
+            };
+            clientDownload.ResumeDownload(downloadPartPath);
         }
 
         private void Button3_Click(object sender, EventArgs e)
         {
-            string fullPath = @"C:\1.jpg";
-            string fullPath1 = @"C:\2.jpg";
-            using (HttpClient client = new HttpClient(new HttpClientHandler() { UseCookies = false }))//若想手动设置Cookie则必须设置UseCookies = false
+            string filePath = @"E:\donetRepair4.5.exe";
+            //string filePath = @"c:\1.jpg";
+            //string filePath = @"E:/Symantec Ghost.rar";
+            this.clientUpload.UploadProgressChanged += (s, p) =>
             {
-                MultipartFormDataContent content = new MultipartFormDataContent();
-                #region Stream请求
-                using (Stream stream = File.Open(fullPath, FileMode.Open, FileAccess.Read))
-                using (Stream stream1 = File.Open(fullPath1, FileMode.Open, FileAccess.Read))
+                this.Invoke(new MethodInvoker(() =>
                 {
-                    content.Add(new StreamContent(stream, 1024 * 8), "file", Path.GetFileName(fullPath));
-                    content.Add(new StreamContent(stream1, 1024 * 8), "file", Path.GetFileName(fullPath1));
-                    var result = client.PostAsync("http://localhost:22437/api/UpgradeServer/upload", content).Result;
-
-                    if (result.IsSuccessStatusCode)
-                    {
-                        string rslt = result.Content.ReadAsStringAsync().Result;
-
-
-                    }
-                }
-                #endregion
-            }
+                    this.label1.Text = p.ToString();
+                }));
+            };
+            this.clientUpload.UploadSpeedChanged += (s, p) =>
+            {
+                this.Invoke(new MethodInvoker(() =>
+                {
+                    this.label2.Text = p.ToString();
+                }));
+            };
+            this.clientUpload.UploadAsync(filePath);
         }
 
         private void Button4_Click(object sender, EventArgs e)
         {
+            //string filePath1 = @"C:\1.jpg";
+            //using (WebClient webClient = new WebClient())
+            //{
+            //    webClient.UploadProgressChanged += (s, ee) =>
+            //    {
+
+            //    };
+            //    webClient.UploadFileCompleted += (s, ee) =>
+            //    {
+            //        var asd = JsonConvert.DeserializeObject<RespondResult>(Encoding.UTF8.GetString(ee.Result));
+            //    };
+            //    webClient.UploadFileAsync(new Uri("http://localhost:22437/api/UpgradeServer/upload"), filePath1);
+            //}
+            //return;
             string filePath = @"E:\donetRepair4.5.exe";
             int chunkSize = 1024 * 1024 * 3; //3M缓存
             FileInfo fileInfo = new FileInfo(filePath);
@@ -105,67 +130,57 @@ namespace TransfeTest
                 for (long i = 0; i < fileInfo.Length; i += chunkSize)
                 {
                     readStream.Position = i;
-                    using (Stream writeStream = new FileStream(Path.Combine("Merge", (i / chunkSize).ToString()), FileMode.Create, FileAccess.ReadWrite))
+                    string chunkPath = Path.Combine("Merge", "chunk");
+                    using (Stream writeStream = File.OpenWrite(chunkPath))
                     {
                         byte[] buffer = new byte[chunkSize];
                         int readLength = readStream.Read(buffer, 0, buffer.Length);
                         writeStream.Write(buffer, 0, readLength);
+                    }
+                    //byte[] chunkMD5 = MD5Tools.GetFileMd5Bytes(chunkPath); 
+                    using (Stream read = File.OpenRead(chunkPath))
+                    {
                         using (HttpClient client = new HttpClient(new HttpClientHandler() { UseCookies = false }))//若想手动设置Cookie则必须设置UseCookies = false
                         {
                             MultipartFormDataContent content = new MultipartFormDataContent();
-                            content.Add(new StreamContent(writeStream, chunkSize), "chunk_" + i, Path.GetFileName(filePath));
-                            var result = client.PostAsync("http://localhost:22437/api/UpgradeServer/upload", content).Result;
-                            if (result.IsSuccessStatusCode)
+                            //content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
+                            //content.Headers.ContentMD5 = chunkMD5;
+                            //content.Headers.ContentLength = readLength;
+                            content.Add(new StreamContent(read, chunkSize), "aaa");
+                            try
                             {
-                                string rslt = result.Content.ReadAsStringAsync().Result;
+                                var result = client.PostAsync("http://localhost:22437/api/UpgradeServer/upload", content).Result;
+                                if (result.IsSuccessStatusCode)
+                                {
+                                    string rslt = result.Content.ReadAsStringAsync().Result;
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                            catch (Exception ex)
+                            {
                             }
                         }
                     }
+                    File.Delete(chunkPath);
                 }
             }
-            //using (HttpClient client = new HttpClient(new HttpClientHandler() { UseCookies = false }))//若想手动设置Cookie则必须设置UseCookies = false
-            //{
-            //    MultipartFormDataContent content = new MultipartFormDataContent();
-            //    for (long i = 0; i < fileInfo.Length; i += chunkSize)
-            //    {
-            //        using (PartialFileStream partialFileStream = new PartialFileStream(filePath, i, i + chunkSize))
-            //        using (Stream writeStream = new FileStream(Path.Combine("Merge", (i / chunkSize).ToString()), FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            //        {
-            //            partialFileStream.CopyTo(writeStream);
-            //            content.Add(new StreamContent(partialFileStream, 1024 * 8), "file", Path.GetFileName(filePath));
-
-            //            var result = client.PostAsync("http://localhost:22437/api/UpgradeServer/upload", content).Result;
-
-            //            if (result.IsSuccessStatusCode)
-            //            {
-            //                string rslt = result.Content.ReadAsStringAsync().Result;
-
-
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         private void Button5_Click(object sender, EventArgs e)
         {
-            string[] files = Directory.GetFiles("Merge").OrderBy(p => Convert.ToInt32(Path.GetFileNameWithoutExtension(p))).ToArray();
-            using (Stream writeStream = File.OpenWrite(Path.Combine("Merge", "donetRepair4.511.exe")))
+            using (HttpClient httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(30) })
             {
-                //long position = 0;
-                for (int i = 0; i < files.Length; i++)
+                var result = httpClient.GetAsync("http://localhost:22437/api/UpgradeServer/merge?fileName=donetRepair4.5.exe").Result;
+                if (result.IsSuccessStatusCode)
                 {
-                    FileStream chunk = File.OpenRead(files[i]);
-                    //writeStream.Position = position;
-                    byte[] buffer = new byte[1024];
-                    int readLength = chunk.Read(buffer, 0, buffer.Length);
-                    while (readLength > 0)
-                    {
-                        writeStream.Write(buffer, 0, readLength);
-                        readLength = chunk.Read(buffer, 0, buffer.Length);
-                    }
-                    //chunk.CopyTo(writeStream);
-                    //position += chunk.Length;
+                    string rslt = result.Content.ReadAsStringAsync().Result;
+                }
+                else
+                {
+
                 }
             }
         }
