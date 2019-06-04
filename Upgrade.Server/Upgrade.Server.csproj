@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FileTransfe\FileTransfe.csproj" />
+    <ProjectReference Include="..\Transfe.Server\Transfe.Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,5 +26,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <Import Project="..\Share.Transfe\Share.Transfe.projitems" Label="Shared" />
+
+  <Import Project="..\Share.Upgrade\Share.Upgrade.projitems" Label="Shared" />
 
 </Project>

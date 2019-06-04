@@ -1,30 +1,15 @@
-﻿using FileTransfe.Entities;
-using FileTransfe.Tools;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using FileTransfe.Core;
-using System.Net;
-using Newtonsoft.Json;
-using FileTransfe;
+using Transfe.Http.File.Core;
 
 namespace TransfeTest
 {
     public partial class Form1 : Form
     {
-        private ClientUpload clientUpload = new ClientUpload("http://localhost:22437/api/UpgradeServer/upload", "http://localhost:22437/api/UpgradeServer/merge");
-        private ClientDownload clientDownload = new ClientDownload("http://localhost:22437/api/UpgradeServer/download");
+        private UploadClient clientUpload = new UploadClient(null, "http://localhost:22437/api/UpgradeServer/upload", "http://localhost:22437/api/UpgradeServer/merge");
+        private DownloadClient clientDownload = new DownloadClient("http://localhost:22437/api/UpgradeServer/download");
         public Form1()
         {
             InitializeComponent();
@@ -48,9 +33,6 @@ namespace TransfeTest
                 }));
             };
             clientDownload.DownloadError += (s, ee) =>
-            {
-            };
-            clientDownload.DownloadCompleted += (s, ee, ss) =>
             {
             };
             clientDownload.Download(fileName);
@@ -78,17 +60,14 @@ namespace TransfeTest
             clientDownload.DownloadError += (s, ee) =>
             {
             };
-            clientDownload.DownloadCompleted += (s, ee, ss) =>
-            {
-            };
             clientDownload.ResumeDownload(downloadPartPath);
         }
 
         private void Button3_Click(object sender, EventArgs e)
         {
-            string filePath = @"E:\donetRepair4.5.exe";
+            //string filePath = @"E:\donetRepair4.5.exe";
             //string filePath = @"c:\1.jpg";
-            //string filePath = @"E:/Symantec Ghost.rar";
+            string filePath = @"E:/Symantec Ghost.rar";
             this.clientUpload.UploadProgressChanged += (s, p) =>
             {
                 this.Invoke(new MethodInvoker(() =>

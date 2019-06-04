@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>dafdf540-2ba0-4672-8ffb-cd2f746bc074</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Share.Transfe</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Args\CompletedArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Args\ErrorArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Args\ProgressChangedArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Args\SpeedChangedArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Delegates\Handler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)File\Core\DownloadClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)File\Core\UploadClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)File\Entities\DownloadFile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Json\RespondResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\FileTools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\DateTimeTools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\MD5Tools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\SerializeTools.cs" />
+  </ItemGroup>
+</Project>

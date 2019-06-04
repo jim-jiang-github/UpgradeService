@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>f17343fe-226c-4b11-9c77-7a5fe5a8a1fc</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Share.Pipe</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Delegate\Handler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PipePackage\FastSerialize.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpgradePackage\PipeUpgradeComplete.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpgradePackage\PipeUpgradeError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpgradePackage\PipeUpgradeContent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpgradePackage\PipeUpgradeUI.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpgradePackage\PipeUpgradeProgress.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpgradePackage\PipeUpgradeMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpgradePackage\PipeUpgradeCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpgradePackage\PipeUpgradeCheckVersion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PipeClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PipeServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PipePackage\Binary.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)UpgradePackage\" />
+  </ItemGroup>
+</Project>

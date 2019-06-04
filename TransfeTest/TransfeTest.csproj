@@ -85,9 +85,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FileTransfe\FileTransfe.csproj">
-      <Project>{29FD9FA8-F735-44B8-B5E4-4C147F27CE99}</Project>
-      <Name>FileTransfe</Name>
+    <ProjectReference Include="..\Transfe.Http.File\Transfe.Http.File.csproj">
+      <Project>{d85cdd6d-2cf9-40d5-ac5b-bbadca3b6dce}</Project>
+      <Name>Transfe.Http.File</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Transfe.Http.Json\Transfe.Http.Json.csproj">
+      <Project>{734d2da5-951c-4a16-be5e-3733a36813b3}</Project>
+      <Name>Transfe.Http.Json</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
